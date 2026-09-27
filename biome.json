@@ -1,0 +1,311 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": ["**", "!**/dist", "!**/coverage", "!**/node_modules"]
+  },
+  "plugins": ["./biome-plugins/types-in-types-folder.grit"],
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "jsxQuoteStyle": "double"
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "correctness": {
+        "noUnusedImports": "error",
+        "noUnusedVariables": "error",
+        "noUnusedFunctionParameters": "error"
+      },
+      "suspicious": {
+        "noExplicitAny": "error",
+        "noConsole": "error",
+        "noImportCycles": "error",
+        "useAwait": "error",
+        "noUnnecessaryConditions": "error",
+        "noEmptyBlockStatements": "error"
+      },
+      "style": {
+        "useImportType": "error",
+        "useExportType": "error",
+        "noNonNullAssertion": "error",
+        "useBlockStatements": "error",
+        "noNestedTernary": "error",
+        "noParameterAssign": "error",
+        "useConsistentTypeDefinitions": {
+          "level": "error",
+          "options": {
+            "style": "interface"
+          }
+        },
+        "useReadonlyClassProperties": "error",
+        "noDefaultExport": "error",
+        "useFilenamingConvention": {
+          "level": "error",
+          "options": {
+            "strictCase": true,
+            "requireAscii": true,
+            "filenameCases": ["kebab-case"]
+          }
+        },
+        "noRestrictedImports": {
+          "level": "error",
+          "options": {
+            "paths": {
+              "zod": "Zod belongs in src/schemas/ (schemas) and src/types/ (z.infer types) only.",
+              "react": "React belongs in src/emails/ only.",
+              "nodemailer": "Only src/services/smtp-mailer.ts talks to SMTP.",
+              "express": "Express belongs in src/app.ts, src/routes/ and src/middleware/ only.",
+              "react-email": "React Email belongs in src/emails/ only.",
+              "pino": "Create loggers in src/logger/; elsewhere use the AppLogger type from @/types/logger.types."
+            },
+            "patterns": [
+              {
+                "group": ["../*", "./*"],
+                "message": "Use the @/ alias (src) or @test/ alias (test) instead of relative imports."
+              }
+            ]
+          }
+        }
+      },
+      "complexity": {
+        "noExcessiveCognitiveComplexity": {
+          "level": "error",
+          "options": {
+            "maxAllowedComplexity": 12
+          }
+        },
+        "useSimplifiedLogicExpression": "error"
+      },
+      "performance": {
+        "noBarrelFile": "error",
+        "noReExportAll": "error",
+        "noNamespaceImport": "error"
+      },
+      "nursery": {
+        "noFloatingPromises": "error",
+        "noMisusedPromises": "error",
+        "useExhaustiveSwitchCases": "error",
+        "useExplicitType": "error"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["src/schemas/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "react": "Schemas must not render emails.",
+                  "nodemailer": "Schemas must not send email.",
+                  "express": "Schemas must not depend on HTTP.",
+                  "pino": "Create loggers in src/logger/; elsewhere use the AppLogger type from @/types/logger.types."
+                },
+                "patterns": [
+                  {
+                    "group": ["../*", "./*"],
+                    "message": "Use the @/ alias (src) or @test/ alias (test) instead of relative imports."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/types/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "nodemailer": "Types must not depend on the SMTP library.",
+                  "express": "Types must not depend on Express."
+                },
+                "patterns": [
+                  {
+                    "group": ["../*", "./*"],
+                    "message": "Use the @/ alias (src) or @test/ alias (test) instead of relative imports."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/emails/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "zod": "Templates receive validated data; parse it in src/validators/.",
+                  "nodemailer": "Templates render; src/services/smtp-mailer.ts sends.",
+                  "express": "Templates must not depend on HTTP.",
+                  "pino": "Create loggers in src/logger/; elsewhere use the AppLogger type from @/types/logger.types."
+                },
+                "patterns": [
+                  {
+                    "group": ["../*", "./*"],
+                    "message": "Use the @/ alias (src) or @test/ alias (test) instead of relative imports."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/app.ts", "src/routes/**", "src/middleware/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "zod": "Use a schema from src/schemas/ through a validator in src/validators/.",
+                  "react": "HTTP code must not render emails.",
+                  "nodemailer": "HTTP code must not send email directly.",
+                  "pino": "Create loggers in src/logger/; elsewhere use the AppLogger type from @/types/logger.types."
+                },
+                "patterns": [
+                  {
+                    "group": ["../*", "./*"],
+                    "message": "Use the @/ alias (src) or @test/ alias (test) instead of relative imports."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/services/smtp-mailer.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "zod": "Services use schemas from src/schemas/.",
+                  "react": "Services must not render emails directly.",
+                  "express": "Services must not depend on HTTP.",
+                  "pino": "Create loggers in src/logger/; elsewhere use the AppLogger type from @/types/logger.types."
+                },
+                "patterns": [
+                  {
+                    "group": ["../*", "./*"],
+                    "message": "Use the @/ alias (src) or @test/ alias (test) instead of relative imports."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["test/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noNonNullAssertion": "off",
+            "noRestrictedImports": "off"
+          },
+          "suspicious": {
+            "useAwait": "off",
+            "noEmptyBlockStatements": "off"
+          },
+          "nursery": {
+            "useExplicitType": "off"
+          },
+          "complexity": {
+            "noExcessiveCognitiveComplexity": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["*.config.ts", "*.config.js"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/emails/previews/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/logger/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "zod": "Loggers do not validate input.",
+                  "react": "Loggers do not render emails.",
+                  "express": "Loggers do not depend on Express."
+                },
+                "patterns": [
+                  {
+                    "group": ["../*", "./*"],
+                    "message": "Use the @/ alias (src) or @test/ alias (test) instead of relative imports."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

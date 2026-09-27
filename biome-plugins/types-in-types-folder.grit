@@ -1,0 +1,10 @@
+language js
+
+or {
+  TsTypeAliasDeclaration() as $decl,
+  TsInterfaceDeclaration() as $decl
+} where {
+  $filename <: not r".*/src/types/.*",
+  $filename <: not r".*/test/.*",
+  register_diagnostic(span=$decl, message="Declare types and interfaces in src/types/ (infer them from Zod schemas in src/schemas/ where possible).")
+}
